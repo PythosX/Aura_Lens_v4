@@ -1,23 +1,6 @@
-# AuraLens
+# AuraLens — Hand Portal Experience
 
-**See the character. Become the character.**
-
-AuraLens is a cinematic browser-based computer-vision experience built by **PythosX**.
-
-## What it does
-
-1. Opens with a cinematic intro.
-2. Requests webcam access.
-3. Detects and stabilizes the user's face.
-4. Captures a temporary face reference **in memory only**.
-5. Aligns an anime-inspired mask to the face using Face Landmarker landmarks.
-6. Guides the user to raise both hands.
-7. Tracks both hands with MediaPipe Hand Landmarker.
-8. Creates a glowing portal between the hands.
-9. Places the selected character visual inside the portal.
-10. Lets the user capture the final composition or reset the experience.
-
-The face reference is never uploaded to a backend by this project.
+A Vite + React + MediaPipe web experience where the selected character is completely hidden until two hands are detected. The thumb and index fingertips from each hand define a four-corner portal. The character artwork is perspective-mapped and clipped to that quadrilateral, so the image appears only inside the space framed by the user's hands.
 
 ## Run locally
 
@@ -26,82 +9,29 @@ npm install
 npm run dev
 ```
 
-Open the local HTTPS/localhost URL and allow camera access.
-
-## Build
-
-```bash
-npm run build
-```
+Open the local URL, allow camera access, and use a well-lit room. Keep both hands visible. Move the thumb/index pairs to resize and rotate the portal.
 
 ## Deploy to Vercel
 
-### GitHub
+1. Push this folder to GitHub.
+2. Import the repository in Vercel.
+3. Framework: Vite.
+4. Build command: `npm run build`.
+5. Output directory: `dist`.
+6. Deploy.
 
-```bash
-git init
-git add .
-git commit -m "Initial AuraLens build"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/AuraLens.git
-git push -u origin main
-```
+No environment variables are required. MediaPipe model/wasm assets are loaded from public CDNs at runtime.
 
-Then import the repository in Vercel.
+## Characters
 
-- Framework preset: **Vite**
-- Build command: `npm run build`
-- Output directory: `dist`
-- No environment variables are required.
+Character artwork is stored in `public/characters/`. Replace those files with your own images if desired; keep the filenames or update `CHARS` in `src/main.jsx`.
 
-### Important camera note
+## Gesture logic
 
-Production camera access requires a secure origin. Vercel provides HTTPS automatically.
+- 0–1 hand: artwork is hidden.
+- 2 hands but small/unstable frame: artwork remains hidden.
+- 2 hands + sufficient thumb/index separation: portal activates.
+- The four points are the thumb and index fingertips of each hand.
+- Artwork is drawn into the four-point quadrilateral and clipped to it.
 
-## Character assets
-
-Original anime-inspired SVG assets are included in:
-
-```text
-public/characters/
-```
-
-Add your own transparent PNG/WebP character art there and register it in:
-
-```text
-src/data/characters.js
-```
-
-For best face-mask results, use a transparent portrait with the face centered.
-
-## Architecture
-
-```text
-src/
-  components/
-    CameraExperience.jsx
-    CharacterSidebar.jsx
-    HUD.jsx
-    PortalCanvas.jsx
-    PythosBrand.jsx
-  data/
-    characters.js
-  vision/
-    mediapipe.js
-    smoothing.js
-  App.jsx
-  main.jsx
-  styles.css
-```
-
-## Browser compatibility
-
-Use a current Chrome, Edge, or Safari browser with webcam support. Performance depends on device GPU/CPU and camera resolution.
-
-## Privacy
-
-The app processes the webcam locally in the browser. The hidden face reference is drawn to an offscreen canvas only for local processing and is not sent to a server.
-
-## Credits
-
-Built by **PythosX**.
+All camera frames are processed in the browser; no camera upload API is used.
